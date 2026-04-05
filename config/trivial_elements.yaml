@@ -1,0 +1,53 @@
+# Trivial (Low-Stakes) Elements for Control Experiments
+# These scenarios have no ethical weight - used as a negative control
+# to verify that the methodology detects genuine ethical structure
+# (ethical scenarios should show MORE structure than trivial ones)
+
+trivial_elements:
+  T01:
+    label: "Pizza Preferences"
+    description: "A group of friends ordering pizza for a dinner party, debating thin crust vs deep dish and topping combinations"
+
+  T02:
+    label: "Basketball Strategy"
+    description: "A recreational basketball team deciding whether to focus on three-point shooting or interior plays for their league game"
+
+  T03:
+    label: "Hiking Routes"
+    description: "Weekend hikers choosing between a scenic mountain trail with steep elevation gain and a flat lakeside path"
+
+  T04:
+    label: "Movie Night"
+    description: "A family selecting a movie for Friday night, weighing action films against comedies and animated features"
+
+  T05:
+    label: "Coffee Preparation"
+    description: "A barista comparing pour-over, French press, and espresso methods for making morning coffee"
+
+  T06:
+    label: "Garden Planning"
+    description: "A homeowner planning their spring garden layout, deciding between raised beds of vegetables, flower borders, and herb spirals"
+
+  T07:
+    label: "Board Game Selection"
+    description: "Game night hosts choosing between a cooperative strategy game, a fast-paced party game, and a classic card game"
+
+  T08:
+    label: "Cooking Methods"
+    description: "A home cook deciding whether to grill, roast, or stir-fry vegetables for a weeknight dinner"
+
+  T09:
+    label: "Weather Activities"
+    description: "A family deciding what to do on a rainy Saturday: indoor crafts, visiting a museum, or going to a swimming pool"
+
+  T10:
+    label: "Music Practice"
+    description: "A student musician allocating practice time between scales and technique, learning new pieces, and improvisation"
+
+  T11:
+    label: "Travel Packing"
+    description: "A traveler packing for a week-long trip, deciding between a carry-on only approach and checking a larger suitcase"
+
+  T12:
+    label: "Pet Care Routine"
+    description: "A dog owner establishing a daily routine: morning walks vs evening walks, scheduled feeding vs free feeding, backyard play vs dog park visits"

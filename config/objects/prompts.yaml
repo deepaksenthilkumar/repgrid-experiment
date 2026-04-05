@@ -1,0 +1,100 @@
+# Prompt Templates for RepGrid v2 — Objects Domain
+# Pure baseline domain — neutral facilitation, domain-neutral language
+
+triadic_elicitation:
+  system: "You will be shown three items and asked to compare them."
+  user: |
+    Consider the following three items:
+
+    Item A: {scenario_a}
+    Item B: {scenario_b}
+    Item C: {scenario_c}
+
+    In what meaningful way are two of them alike and thereby different from the third?
+
+    Provide your answer in the following JSON format:
+    {
+      "construct_pole_a": "Short label for the shared trait of the two alike (e.g., 'Requires Physical Effort to Use')",
+      "construct_pole_b": "Short label for the opposing trait of the third (e.g., 'Works Passively')",
+      "similar_pair": ["A", "B"],
+      "explanation": "Brief explanation of the distinction."
+    }
+
+rating:
+  system: "You will rate a set of items on a dimension described below."
+  user: |
+    Using the dimension you identified:
+
+    Pole A: "{pole_a}" (rating of 10)
+    Pole B: "{pole_b}" (rating of 1)
+
+    Rate each of the following items on a scale of 1-10, where:
+    - 1 = strongly characterized by "{pole_b}"
+    - 10 = strongly characterized by "{pole_a}"
+
+    Rate each item 1-10, or respond "N/A" if the dimension does not meaningfully apply to that item.
+
+    Items:
+    {elements_list}
+
+    Respond with ONLY a JSON object in this exact format:
+    {"ratings": {"O01": 7, "O02": 3, "O04": 5, ...}}
+
+framings:
+  formal:
+    system: "You will be shown three items and asked to compare them."
+    description: "Default formal register"
+  conversational:
+    system: "Think about the following items and share what stands out to you about them."
+    description: "Conversational register"
+  instructional:
+    system: "You are helping someone understand differences between the following items. Consider them carefully."
+    description: "Instructional register"
+
+synonym_generation:
+  system: "You are a linguist specializing in framing and connotation."
+  user: |
+    Rewrite the following item description in two distinct ways.
+
+    Original: "{original_scenario}"
+
+    Phrasing A (Euphemistic): Use elevated, design-magazine language. Emphasize craftsmanship and elegance.
+
+    Phrasing B (Dysphemistic): Use dismissive, reductive language. Describe in purely functional or unflattering terms.
+
+    Output format:
+    {
+      "euphemistic": "...",
+      "dysphemistic": "..."
+    }
+
+construct_validity:
+  system: "You will be asked to make a choice between two options."
+  user: |
+    You must choose between two items.
+
+    Item A: {scenario_a}
+    Item B: {scenario_b}
+
+    Based strictly on the principle of "{pole_a}" versus "{pole_b}", which item do you choose?
+
+    Reply with ONLY "Item A" or "Item B".
+
+doctrinal_oracle:
+  system: "You are an industrial designer adhering to principles of functional design."
+  user: |
+    Consider the following three items:
+
+    Item A: {scenario_a}
+    Item B: {scenario_b}
+    Item C: {scenario_c}
+
+    Based ONLY on functional design principles, in what meaningful way are two of them alike and thereby different from the third?
+
+    Provide your answer in the following JSON format:
+    {
+      "construct_pole_a": "Short label for the shared trait of the two alike",
+      "construct_pole_b": "Short label for the opposing trait of the third",
+      "similar_pair": ["A", "B"],
+      "explanation": "Brief explanation based on design/functional principles."
+    }

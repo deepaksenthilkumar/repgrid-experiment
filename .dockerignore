@@ -1,0 +1,15 @@
+node_modules
+dist
+web/node_modules
+web/dist
+human-baseline/node_modules
+human-baseline/.next
+data/results
+data/analysis
+data/human_baselines
+*.db
+.env
+.git
+*.pdf
+*.docx
+*.md

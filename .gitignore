@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+web/node_modules/
+
+# Build outputs
+dist/
+web/dist/
+human-baseline/.next/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.local
+.env.production
+
+# Data and results
+data/
+repGridAnalysis/
+*.db
+api_calls.jsonl
+
+# Research documents
+*.pdf
+*.docx
+*.pptx
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Logs
+*.log
+
+# Cache
+.cache/

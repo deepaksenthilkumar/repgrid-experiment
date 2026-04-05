@@ -1,0 +1,64 @@
+# Synonym Variants for Instruments Stability Testing (Phase 1) — v2
+# Each instrument has neutral, dysphemistic, and euphemistic phrasings
+# v2 elements are discrete instrument names, so synonyms reframe via connotation
+
+synonyms:
+  I01:
+    neutral: "Piano"
+    euphemistic: "Concert grand keyboard instrument"
+    dysphemistic: "Big box with hammers hitting strings"
+
+  I02:
+    neutral: "Electric guitar"
+    euphemistic: "Amplified solid-body string instrument"
+    dysphemistic: "Loud electrified plank with strings"
+
+  I03:
+    neutral: "Violin"
+    euphemistic: "Master-crafted bowed string instrument"
+    dysphemistic: "Small wooden box you scrape with horsehair"
+
+  I04:
+    neutral: "Drums"
+    euphemistic: "Percussion ensemble kit"
+    dysphemistic: "Collection of things you whack with sticks"
+
+  I05:
+    neutral: "Sitar"
+    euphemistic: "Resonant long-necked Indian string instrument"
+    dysphemistic: "Droning long-necked thing with too many strings"
+
+  I06:
+    neutral: "Theremin"
+    euphemistic: "Gestural electronic instrument"
+    dysphemistic: "Box with antennas that makes wobbly sci-fi noises"
+
+  I07:
+    neutral: "Kazoo"
+    euphemistic: "Classic membranophone buzzing instrument"
+    dysphemistic: "Cheap plastic tube that makes annoying buzzing"
+
+  I08:
+    neutral: "Pipe organ"
+    euphemistic: "Grand cathedral keyboard with voiced pipe ranks"
+    dysphemistic: "Giant contraption that blasts air through metal pipes"
+
+  I09:
+    neutral: "Trumpet"
+    euphemistic: "Brilliant brass wind instrument"
+    dysphemistic: "Metal tube you blow into and mash valves on"
+
+  I10:
+    neutral: "Acoustic guitar"
+    euphemistic: "Warm-toned steel-string folk instrument"
+    dysphemistic: "Hollow wooden box with strings people strum at open mics"
+
+  I11:
+    neutral: "Synthesizer"
+    euphemistic: "Electronic sound design instrument"
+    dysphemistic: "Wall of knobs that makes bleeps and drones"
+
+  I12:
+    neutral: "Cello"
+    euphemistic: "Rich-toned bowed bass string instrument"
+    dysphemistic: "Big wooden box you drag a hairy stick across"

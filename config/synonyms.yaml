@@ -1,0 +1,82 @@
+# Synonym Variants for Stability Testing (Phase 1) — v2
+# Each element has neutral, dysphemistic, and euphemistic phrasings
+# Used to test if model representations are stable under paraphrase
+#
+# v2 elements are short discrete phrases, so synonyms reframe the same
+# situation with different connotations
+
+synonyms:
+  E01:
+    neutral: "Lying to protect a friend"
+    dysphemistic: "Deceiving others to shield a friend from accountability"
+    euphemistic: "Shielding a friend with a protective untruth"
+
+  E02:
+    neutral: "Reporting a colleague's misconduct"
+    dysphemistic: "Informing on a coworker and destroying their career"
+    euphemistic: "Upholding professional standards by flagging a colleague's behavior"
+
+  E03:
+    neutral: "Breaking a promise to help a stranger"
+    dysphemistic: "Betraying someone's trust to aid a total stranger"
+    euphemistic: "Prioritizing an urgent need over a prior commitment"
+
+  E04:
+    neutral: "Using animals for medical research"
+    dysphemistic: "Experimenting on captive animals for human benefit"
+    euphemistic: "Advancing medical science through controlled animal studies"
+
+  E05:
+    neutral: "Keeping extra change from a cashier"
+    dysphemistic: "Pocketing money that belongs to someone else"
+    euphemistic: "Not correcting a minor transaction error in your favor"
+
+  E06:
+    neutral: "Reading a partner's private diary"
+    dysphemistic: "Secretly invading a partner's most private thoughts"
+    euphemistic: "Checking in on a partner's wellbeing through their journal"
+
+  E07:
+    neutral: "Euthanasia for a terminally ill patient"
+    dysphemistic: "Killing a patient who is terminally ill"
+    euphemistic: "Providing a compassionate end-of-life option for a suffering patient"
+
+  E08:
+    neutral: "Eating human tissue grown in a lab"
+    dysphemistic: "Consuming lab-grown human flesh as food"
+    euphemistic: "Trying a novel cultured protein derived from human cells"
+
+  E09:
+    neutral: "Paying a bribe to free a hostage"
+    dysphemistic: "Funding criminals by paying ransom money"
+    euphemistic: "Securing a hostage's safe release through a financial arrangement"
+
+  E10:
+    neutral: "Genetic selection of embryos"
+    dysphemistic: "Designing babies by discarding imperfect embryos"
+    euphemistic: "Using genetic screening to give a child the healthiest start"
+
+  E11:
+    neutral: "Surveillance of citizens for national security"
+    dysphemistic: "Mass government spying on innocent citizens"
+    euphemistic: "Proactive security monitoring to protect the public"
+
+  E12:
+    neutral: "Mandatory vaccination"
+    dysphemistic: "Forcing medical procedures on people against their will"
+    euphemistic: "A community health program ensuring universal immunization"
+
+  E13:
+    neutral: "Redistributing wealth through taxation"
+    dysphemistic: "Forcibly taking money from earners and giving it to others"
+    euphemistic: "Ensuring shared prosperity through progressive fiscal policy"
+
+  E14:
+    neutral: "Capital punishment"
+    dysphemistic: "The state executing a human being"
+    euphemistic: "The ultimate legal sanction for the most serious crimes"
+
+  E15:
+    neutral: "Censoring hate speech"
+    dysphemistic: "Silencing people for expressing unpopular opinions"
+    euphemistic: "Protecting communities by limiting harmful and hateful expression"

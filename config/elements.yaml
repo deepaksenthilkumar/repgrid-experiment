@@ -1,0 +1,86 @@
+# Ethics Element Set for RepGrid v2
+# Theory-neutral selection: 15 discrete ethical situations
+# No MFT pre-categorisation — structure should emerge from the model, not the researcher
+#
+# Design rationale:
+# - Short, discrete phrases (3-8 words)
+# - 2 low-stakes elements (E05, E06) for dynamic range
+# - 1 visceral/sanctity trigger (E08) for width
+# - 12 moderate-to-high-stakes spanning interpersonal/institutional/bioethical/political
+# - 455 possible triads — sufficient for 8-10 constructs per grid
+
+elements:
+  E01:
+    label: "Lying to protect a friend"
+    description: "Lying to protect a friend"
+    pilot: true
+
+  E02:
+    label: "Reporting a colleague's misconduct"
+    description: "Reporting a colleague's misconduct"
+    pilot: true
+
+  E03:
+    label: "Breaking a promise to help a stranger"
+    description: "Breaking a promise to help a stranger"
+    pilot: true
+
+  E04:
+    label: "Using animals for medical research"
+    description: "Using animals for medical research"
+    pilot: true
+
+  E05:
+    label: "Keeping extra change from a cashier"
+    description: "Keeping extra change from a cashier"
+    pilot: true
+
+  E06:
+    label: "Reading a partner's private diary"
+    description: "Reading a partner's private diary"
+    pilot: true
+
+  E07:
+    label: "Euthanasia for a terminally ill patient"
+    description: "Euthanasia for a terminally ill patient"
+    pilot: true
+
+  E08:
+    label: "Eating human tissue grown in a lab"
+    description: "Eating human tissue grown in a lab"
+    pilot: true
+
+  E09:
+    label: "Paying a bribe to free a hostage"
+    description: "Paying a bribe to free a hostage"
+    pilot: true
+
+  E10:
+    label: "Genetic selection of embryos"
+    description: "Genetic selection of embryos"
+    pilot: true
+
+  E11:
+    label: "Surveillance of citizens for national security"
+    description: "Surveillance of citizens for national security"
+    pilot: true
+
+  E12:
+    label: "Mandatory vaccination"
+    description: "Mandatory vaccination"
+    pilot: true
+
+  E13:
+    label: "Redistributing wealth through taxation"
+    description: "Redistributing wealth through taxation"
+    pilot: true
+
+  E14:
+    label: "Capital punishment"
+    description: "Capital punishment"
+    pilot: true
+
+  E15:
+    label: "Censoring hate speech"
+    description: "Censoring hate speech"
+    pilot: true

@@ -1,0 +1,64 @@
+# Meals Element Set for RepGrid v2
+# Stripped to discrete meal names — no parenthetical descriptions
+# The model's construal of what each meal means is itself data
+
+elements:
+  M01:
+    label: "Sushi"
+    description: "Sushi"
+    pilot: true
+
+  M02:
+    label: "Beef brisket"
+    description: "Beef brisket"
+    pilot: true
+
+  M03:
+    label: "Pad Thai"
+    description: "Pad Thai"
+    pilot: true
+
+  M04:
+    label: "French onion soup"
+    description: "French onion soup"
+    pilot: true
+
+  M05:
+    label: "Instant ramen"
+    description: "Instant ramen"
+    pilot: true
+
+  M06:
+    label: "Caprese salad"
+    description: "Caprese salad"
+    pilot: true
+
+  M07:
+    label: "Fish and chips"
+    description: "Fish and chips"
+    pilot: true
+
+  M08:
+    label: "Chicken tikka masala"
+    description: "Chicken tikka masala"
+    pilot: true
+
+  M09:
+    label: "Hot dog"
+    description: "Hot dog"
+    pilot: true
+
+  M10:
+    label: "Beef Wellington"
+    description: "Beef Wellington"
+    pilot: true
+
+  M11:
+    label: "Acai bowl"
+    description: "Acai bowl"
+    pilot: true
+
+  M12:
+    label: "Tacos al pastor"
+    description: "Tacos al pastor"
+    pilot: true

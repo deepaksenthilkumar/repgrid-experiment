@@ -1,0 +1,64 @@
+# Synonym Variants for Meals Stability Testing (Phase 1) — v2
+# Each meal has neutral, dysphemistic, and euphemistic phrasings
+# v2 elements are discrete meal names, so synonyms reframe via connotation
+
+synonyms:
+  M01:
+    neutral: "Sushi"
+    euphemistic: "Artisan Japanese rice and fish preparation"
+    dysphemistic: "Raw dead fish on cold rice"
+
+  M02:
+    neutral: "Beef brisket"
+    euphemistic: "Slow-smoked heritage beef"
+    dysphemistic: "Slab of fatty smoked cow meat"
+
+  M03:
+    neutral: "Pad Thai"
+    euphemistic: "Classic Thai stir-fried rice noodles"
+    dysphemistic: "Greasy fried noodles with crushed peanuts"
+
+  M04:
+    neutral: "French onion soup"
+    euphemistic: "Rich caramelized onion broth with aged Gruyère"
+    dysphemistic: "Salty onion broth with soggy bread and melted cheese"
+
+  M05:
+    neutral: "Instant ramen"
+    euphemistic: "Convenient Asian-inspired noodle bowl"
+    dysphemistic: "Sodium-laden processed noodle packet"
+
+  M06:
+    neutral: "Caprese salad"
+    euphemistic: "Fresh mozzarella and vine-ripened tomato composition"
+    dysphemistic: "Sliced tomatoes and a blob of soft cheese with leaves"
+
+  M07:
+    neutral: "Fish and chips"
+    euphemistic: "Golden beer-battered cod with hand-cut chips"
+    dysphemistic: "Greasy deep-fried fish and soggy fat chips"
+
+  M08:
+    neutral: "Chicken tikka masala"
+    euphemistic: "Tandoori-marinated chicken in velvety spiced sauce"
+    dysphemistic: "Chunks of dry chicken drowned in heavy oily sauce"
+
+  M09:
+    neutral: "Hot dog"
+    euphemistic: "Classic all-beef frankfurter in a pillowy bun"
+    dysphemistic: "Tube of processed mystery meat in a cheap white bun"
+
+  M10:
+    neutral: "Beef Wellington"
+    euphemistic: "Prime beef tenderloin in mushroom duxelles and puff pastry"
+    dysphemistic: "Piece of beef hidden in soggy mushroom paste and heavy pastry"
+
+  M11:
+    neutral: "Acai bowl"
+    euphemistic: "Antioxidant-rich berry bowl with artisan granola"
+    dysphemistic: "Thick purple mush with granola dumped on top"
+
+  M12:
+    neutral: "Tacos al pastor"
+    euphemistic: "Spit-roasted pork with caramelized pineapple on corn tortillas"
+    dysphemistic: "Greasy pork hacked off a spit on small tortillas"

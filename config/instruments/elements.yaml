@@ -1,0 +1,64 @@
+# Instruments Element Set for RepGrid v2
+# Discrete instrument names only — no performance vignettes
+# If the model construes piano as "classical/high-status", that's data about the model
+
+elements:
+  I01:
+    label: "Piano"
+    description: "Piano"
+    pilot: true
+
+  I02:
+    label: "Electric guitar"
+    description: "Electric guitar"
+    pilot: true
+
+  I03:
+    label: "Violin"
+    description: "Violin"
+    pilot: true
+
+  I04:
+    label: "Drums"
+    description: "Drums"
+    pilot: true
+
+  I05:
+    label: "Sitar"
+    description: "Sitar"
+    pilot: true
+
+  I06:
+    label: "Theremin"
+    description: "Theremin"
+    pilot: true
+
+  I07:
+    label: "Kazoo"
+    description: "Kazoo"
+    pilot: true
+
+  I08:
+    label: "Pipe organ"
+    description: "Pipe organ"
+    pilot: true
+
+  I09:
+    label: "Trumpet"
+    description: "Trumpet"
+    pilot: true
+
+  I10:
+    label: "Acoustic guitar"
+    description: "Acoustic guitar"
+    pilot: true
+
+  I11:
+    label: "Synthesizer"
+    description: "Synthesizer"
+    pilot: true
+
+  I12:
+    label: "Cello"
+    description: "Cello"
+    pilot: true

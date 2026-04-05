@@ -1,0 +1,229 @@
+# Experiment Configuration — Instruments (Pure Emergent Baseline)
+# Near-zero RLHF pressure domain to establish genuine emergent representation behavior
+
+experiment:
+  name: "RepGrid Instruments Pilot"
+  version: "0.1.0"
+  description: "Pure emergent baseline using musical instruments — near-zero RLHF pressure domain"
+
+# Model configuration (shared across categories)
+models:
+  primary:
+    provider: "anthropic"
+    model: "claude-haiku-4-5-20251001"
+    temperature: 0.0
+    maxTokens: 1024
+
+  comparison:
+    - provider: "anthropic"
+      model: "claude-sonnet-4-5-20250929"
+      temperature: 0.0
+      maxTokens: 1024
+
+  registry:
+    claude-haiku:
+      provider: "anthropic"
+      model: "claude-haiku-4-5-20251001"
+      temperature: 0.0
+      maxTokens: 1024
+    claude-sonnet:
+      provider: "anthropic"
+      model: "claude-sonnet-4-5-20250929"
+      temperature: 0.0
+      maxTokens: 1024
+    claude-opus:
+      provider: "anthropic"
+      model: "claude-opus-4-6"
+      temperature: 0.0
+      maxTokens: 1024
+    gpt-5:
+      provider: "openai"
+      model: "gpt-5.2"
+      temperature: 0.0
+      maxTokens: 1024
+    gpt-4.1:
+      provider: "openai"
+      model: "gpt-4.1"
+      temperature: 0.0
+      maxTokens: 1024
+    o3:
+      provider: "openai"
+      model: "o3"
+      temperature: 0.0
+      maxTokens: 1024
+    gemini-2.5-pro:
+      provider: "gemini"
+      model: "gemini-2.5-pro"
+      temperature: 0.0
+      maxTokens: 8192
+    gemini-2.5-flash:
+      provider: "gemini"
+      model: "gemini-2.5-flash"
+      temperature: 0.0
+      maxTokens: 8192
+    deepseek-v3:
+      provider: "deepseek"
+      model: "deepseek-chat"
+      temperature: 0.0
+      maxTokens: 1024
+    deepseek-r1:
+      provider: "deepseek"
+      model: "deepseek-reasoner"
+      temperature: 0.0
+      maxTokens: 1024
+    deepseek-v3-openrouter:
+      provider: "openrouter"
+      model: "deepseek/deepseek-chat"
+      temperature: 0.0
+      maxTokens: 1024
+    deepseek-r1-openrouter:
+      provider: "openrouter"
+      model: "deepseek/deepseek-reasoner"
+      temperature: 0.0
+      maxTokens: 1024
+    llama-4:
+      provider: "ollama"
+      model: "llama4:scout"
+      temperature: 0.0
+      maxTokens: 1024
+      baseUrl: "http://localhost:11434"
+    deepseek:
+      provider: "ollama"
+      model: "deepseek-v3.2"
+      temperature: 0.0
+      maxTokens: 1024
+      baseUrl: "http://localhost:11434"
+    gpt-oss:
+      provider: "ollama"
+      model: "gpt-oss-120b"
+      temperature: 0.0
+      maxTokens: 1024
+      baseUrl: "http://localhost:11434"
+
+# Embedding configuration
+embeddings:
+  provider: "voyage"
+  model: "voyage-3"
+  clusterThreshold: 0.8
+  calibratedThreshold: null
+  useCalibrated: false
+
+# Evaluation awareness mitigation
+evaluation_awareness:
+  rotateFramings: false
+  framings:
+    - "clinical"
+    - "naturalistic"
+    - "classroom"
+  defaultFraming: "clinical"
+
+# Temperature sensitivity analysis
+sensitivity:
+  enabled: false
+  temperatures:
+    - 0.0
+    - 0.3
+    - 0.7
+    - 1.0
+
+# Pilot experiment parameters
+pilot:
+  usePilotElements: true
+  elementCount: 12
+  iterations: 10
+  constructsPerGrid: 5
+  phrasings:
+    - "neutral"
+    - "dysphemistic"
+  personas:
+    - "default"
+    - "classical-purist"
+
+# Full experiment parameters
+full:
+  usePilotElements: false
+  elementCount: 15
+  iterations: 50
+  constructsPerGrid: 8
+  phrasings:
+    - "neutral"
+    - "euphemistic"
+    - "dysphemistic"
+  personas:
+    - "default"
+    - "classical-purist"
+    - "experimental"
+
+# Phase configuration
+phases:
+  phase0:
+    name: "Baseline Stability Audit"
+    description: "Establish baseline semantic consistency for musical instrument representations"
+    enabled: true
+    iterations: 10
+    persona: "default"
+    phrasing: "neutral"
+
+  phase1:
+    name: "Synonym Attack"
+    description: "Test stability under paraphrase (neutral vs dysphemistic)"
+    enabled: true
+    iterations: 10
+    persona: "default"
+    phrasings:
+      - "neutral"
+      - "dysphemistic"
+
+  phase2:
+    name: "Persona Invariance"
+    description: "Test stability under persona steering (default vs classical-purist)"
+    enabled: true
+    iterations: 10
+    phrasing: "neutral"
+    personas:
+      - "default"
+      - "classical-purist"
+
+  phase3:
+    name: "Cross-Model Comparison"
+    description: "Compare stability across model sizes"
+    enabled: false
+
+  phase4:
+    name: "Construct Validity"
+    description: "Validate that elicited dimensions predict behavior"
+    enabled: false
+
+  phase5:
+    name: "Doctrinal Alignment"
+    description: "Measure alignment to musicological reference topology"
+    enabled: false
+
+# Thresholds (same as ethics — preliminary)
+thresholds:
+  baselineCosineSimilarity:
+    pass: 0.7
+    warn: 0.5
+    description: "Average pairwise cosine similarity of constructs across iterations"
+
+  synonymVarianceRatio:
+    stable: 1.5
+    fragile: 3.0
+    description: "Ratio of between-phrasing variance to within-model variance"
+
+  personaDisplacementScore:
+    robust: 0.3
+    plastic: 0.7
+    description: "Average Euclidean distance in Procrustes-aligned space"
+
+  procrustesResidual:
+    stable: 0.2
+    unstable: 0.5
+    description: "Normalized Procrustes residual after GPA alignment - lower is more stable"
+
+# Logging configuration
+logging:
+  logApiCalls: true
+  logGrids: true
+  logEmbeddings: true
+  outputDir: "data/results"

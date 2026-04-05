@@ -1,0 +1,65 @@
+# Objects Element Set for RepGrid v2
+# Pure baseline domain — zero evaluative loading
+# If a model shows significant structure here, GPA may be detecting
+# general semantic organisation, not domain-specific structure
+
+elements:
+  O01:
+    label: "Hammer"
+    description: "Hammer"
+    pilot: true
+
+  O02:
+    label: "Mirror"
+    description: "Mirror"
+    pilot: true
+
+  O03:
+    label: "Candle"
+    description: "Candle"
+    pilot: true
+
+  O04:
+    label: "Bicycle"
+    description: "Bicycle"
+    pilot: true
+
+  O05:
+    label: "Clock"
+    description: "Clock"
+    pilot: true
+
+  O06:
+    label: "Telescope"
+    description: "Telescope"
+    pilot: true
+
+  O07:
+    label: "Umbrella"
+    description: "Umbrella"
+    pilot: true
+
+  O08:
+    label: "Ladder"
+    description: "Ladder"
+    pilot: true
+
+  O09:
+    label: "Key"
+    description: "Key"
+    pilot: true
+
+  O10:
+    label: "Compass"
+    description: "Compass"
+    pilot: true
+
+  O11:
+    label: "Rope"
+    description: "Rope"
+    pilot: true
+
+  O12:
+    label: "Lantern"
+    description: "Lantern"
+    pilot: true

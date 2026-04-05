@@ -1,0 +1,64 @@
+# Synonym Variants for Objects Stability Testing (Phase 1) — v2
+# Each object has neutral, dysphemistic, and euphemistic phrasings
+# Objects are single words, so synonyms reframe via connotation/register
+
+synonyms:
+  O01:
+    neutral: "Hammer"
+    euphemistic: "Precision striking tool"
+    dysphemistic: "Blunt metal club"
+
+  O02:
+    neutral: "Mirror"
+    euphemistic: "Reflective looking glass"
+    dysphemistic: "Sheet of coated glass"
+
+  O03:
+    neutral: "Candle"
+    euphemistic: "Wax taper with a gentle flame"
+    dysphemistic: "Stick of melting wax"
+
+  O04:
+    neutral: "Bicycle"
+    euphemistic: "Human-powered two-wheeled vehicle"
+    dysphemistic: "Rickety two-wheeled contraption"
+
+  O05:
+    neutral: "Clock"
+    euphemistic: "Precision timepiece"
+    dysphemistic: "Ticking mechanical box"
+
+  O06:
+    neutral: "Telescope"
+    euphemistic: "Optical magnification instrument"
+    dysphemistic: "Tube with lenses for staring at distant things"
+
+  O07:
+    neutral: "Umbrella"
+    euphemistic: "Portable rain canopy"
+    dysphemistic: "Flimsy fabric dome on a stick"
+
+  O08:
+    neutral: "Ladder"
+    euphemistic: "Ascending support structure"
+    dysphemistic: "Wobbly set of rungs"
+
+  O09:
+    neutral: "Key"
+    euphemistic: "Precision-cut access device"
+    dysphemistic: "Small jagged piece of metal"
+
+  O10:
+    neutral: "Compass"
+    euphemistic: "Magnetic navigation instrument"
+    dysphemistic: "Wobbly needle in a case"
+
+  O11:
+    neutral: "Rope"
+    euphemistic: "Braided cordage"
+    dysphemistic: "Length of twisted fibers"
+
+  O12:
+    neutral: "Lantern"
+    euphemistic: "Portable illumination device"
+    dysphemistic: "Metal box with a light inside"
