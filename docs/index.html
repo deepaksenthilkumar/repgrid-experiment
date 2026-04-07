@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RepGrid Experiment &mdash; Architecture &amp; Setup Guide</title>
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0f1117;
+      --surface: #181b24;
+      --surface2: #1e2230;
+      --border: #2a2e3d;
+      --text: #c9cdd6;
+      --text-muted: #7c829a;
+      --heading: #e4e7ee;
+      --accent: #6c8cff;
+      --accent-dim: #3b4f8a;
+      --green: #4ade80;
+      --amber: #fbbf24;
+      --red: #f87171;
+      --code-bg: #14161e;
+      --radius: 8px;
+      --font-mono: 'SF Mono', 'Fira Code', 'JetBrains Mono', Consolas, monospace;
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── Layout ── */
+    .page { display: flex; min-height: 100vh; }
+    .sidebar {
+      position: fixed; top: 0; left: 0; width: 260px; height: 100vh;
+      background: var(--surface); border-right: 1px solid var(--border);
+      overflow-y: auto; padding: 24px 0; z-index: 10;
+    }
+    .sidebar-logo {
+      padding: 0 20px 20px; border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .sidebar-logo h1 { font-size: 16px; color: var(--heading); font-weight: 700; }
+    .sidebar-logo p { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+    .sidebar nav a {
+      display: block; padding: 7px 20px; font-size: 13px;
+      color: var(--text-muted); transition: all 0.15s;
+    }
+    .sidebar nav a:hover { color: var(--heading); background: var(--surface2); text-decoration: none; }
+    .sidebar nav a.section-title {
+      font-weight: 600; color: var(--text); font-size: 11px;
+      text-transform: uppercase; letter-spacing: 0.8px;
+      margin-top: 16px; pointer-events: none;
+    }
+    .content { margin-left: 260px; flex: 1; padding: 40px 60px 80px; max-width: 920px; }
+
+    /* ── Typography ── */
+    h2 {
+      font-size: 26px; color: var(--heading); font-weight: 700;
+      margin: 48px 0 16px; padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    h2:first-of-type { border-top: none; margin-top: 0; }
+    h3 { font-size: 18px; color: var(--heading); font-weight: 600; margin: 32px 0 12px; }
+    h4 { font-size: 15px; color: var(--accent); font-weight: 600; margin: 24px 0 8px; }
+    p { margin-bottom: 14px; }
+    ul, ol { margin: 0 0 16px 24px; }
+    li { margin-bottom: 6px; }
+
+    /* ── Code ── */
+    code {
+      font-family: var(--font-mono); font-size: 13px;
+      background: var(--code-bg); padding: 2px 6px; border-radius: 4px;
+    }
+    pre {
+      background: var(--code-bg); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 16px 20px;
+      overflow-x: auto; margin: 12px 0 20px; line-height: 1.5;
+    }
+    pre code { background: none; padding: 0; font-size: 13px; }
+    .cmd { color: var(--green); }
+    .comment { color: var(--text-muted); }
+    .flag { color: var(--amber); }
+
+    /* ── Cards & Boxes ── */
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px 24px; margin: 16px 0;
+    }
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 16px 0; }
+    .card h4 { margin-top: 0; }
+    .badge {
+      display: inline-block; font-size: 11px; font-weight: 600;
+      padding: 2px 8px; border-radius: 12px; margin-right: 6px;
+    }
+    .badge-green { background: rgba(74,222,128,.15); color: var(--green); }
+    .badge-amber { background: rgba(251,191,36,.15); color: var(--amber); }
+    .badge-red { background: rgba(248,113,113,.15); color: var(--red); }
+    .badge-blue { background: rgba(108,140,255,.15); color: var(--accent); }
+
+    .callout {
+      border-left: 3px solid var(--accent); background: var(--surface);
+      padding: 14px 18px; border-radius: 0 var(--radius) var(--radius) 0;
+      margin: 16px 0; font-size: 14px;
+    }
+    .callout-warn { border-left-color: var(--amber); }
+    .callout strong { color: var(--heading); }
+
+    /* ── Tables ── */
+    table {
+      width: 100%; border-collapse: collapse; margin: 12px 0 20px;
+      font-size: 14px;
+    }
+    th {
+      text-align: left; padding: 10px 14px; background: var(--surface2);
+      color: var(--heading); font-weight: 600; border-bottom: 1px solid var(--border);
+    }
+    td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+
+    /* ── Diagrams ── */
+    .diagram {
+      background: var(--code-bg); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 24px;
+      font-family: var(--font-mono); font-size: 13px;
+      line-height: 1.6; overflow-x: auto; margin: 16px 0 24px;
+      white-space: pre; color: var(--text-muted);
+    }
+    .diagram .box { color: var(--accent); }
+    .diagram .arrow { color: var(--text-muted); }
+    .diagram .label { color: var(--heading); }
+
+    /* ── Phase Timeline ── */
+    .timeline { position: relative; padding-left: 28px; margin: 20px 0; }
+    .timeline::before {
+      content: ''; position: absolute; left: 8px; top: 4px; bottom: 4px;
+      width: 2px; background: var(--border);
+    }
+    .timeline-item { position: relative; margin-bottom: 24px; }
+    .timeline-item::before {
+      content: ''; position: absolute; left: -24px; top: 6px;
+      width: 12px; height: 12px; border-radius: 50%;
+      background: var(--accent); border: 2px solid var(--bg);
+    }
+    .timeline-item h4 { margin-top: 0; }
+
+    /* ── File Tree ── */
+    .file-tree { font-family: var(--font-mono); font-size: 13px; line-height: 1.8; }
+    .file-tree .dir { color: var(--accent); font-weight: 600; }
+    .file-tree .file { color: var(--text); }
+    .file-tree .desc { color: var(--text-muted); font-family: var(--font-sans); font-size: 12px; }
+
+    /* ── Responsive ── */
+    @media (max-width: 860px) {
+      .sidebar { display: none; }
+      .content { margin-left: 0; padding: 24px 20px 60px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ─── Sidebar ─── -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <h1>RepGrid Experiment</h1>
+      <p>Architecture &amp; Setup Guide</p>
+    </div>
+    <nav>
+      <a class="section-title">Overview</a>
+      <a href="#what">What Is This?</a>
+      <a href="#methodology">Repertory Grid Methodology</a>
+      <a href="#architecture">System Architecture</a>
+
+      <a class="section-title">How It Works</a>
+      <a href="#flow">Experiment Flow</a>
+      <a href="#phases">Experimental Phases</a>
+      <a href="#analysis">Analysis &amp; Metrics</a>
+      <a href="#codebase">Codebase Map</a>
+
+      <a class="section-title">Setup</a>
+      <a href="#prerequisites">Prerequisites</a>
+      <a href="#install">Installation</a>
+      <a href="#env">Environment Variables</a>
+      <a href="#run-dev">Run in Development</a>
+      <a href="#cli">CLI Usage</a>
+
+      <a class="section-title">Deployment</a>
+      <a href="#docker">Docker</a>
+      <a href="#production">Production (Railway + Vercel)</a>
+
+      <a class="section-title">Reference</a>
+      <a href="#api">API Endpoints</a>
+      <a href="#models">Supported Models</a>
+      <a href="#config">Configuration Files</a>
+      <a href="#glossary">Glossary</a>
+    </nav>
+  </aside>
+
+  <!-- ─── Main Content ─── -->
+  <main class="content">
+
+    <!-- ════════════════════════════════ OVERVIEW ════════════════════════════════ -->
+
+    <h2 id="what">What Is This?</h2>
+    <p>
+      <strong>RepGrid Experiment</strong> is a research harness that measures whether Large Language
+      Models (LLMs) maintain <em>stable conceptual representations</em> across different conditions.
+      It uses <strong>Repertory Grid</strong> methodology &mdash; a technique from psychology &mdash;
+      to elicit the mental dimensions an LLM uses to categorize items, then statistically tests
+      whether those dimensions shift when you rephrase questions, apply personas, or switch models.
+    </p>
+    <div class="card-grid">
+      <div class="card">
+        <h4>The Question</h4>
+        <p>If you ask an LLM "how do you categorize these ethical scenarios?" 50 times, do you get the same conceptual structure each time?</p>
+      </div>
+      <div class="card">
+        <h4>The Method</h4>
+        <p>Triadic elicitation: show 3 items, ask "which two are alike?", capture the dimension. Repeat. Measure consistency with embeddings and Procrustes analysis.</p>
+      </div>
+      <div class="card">
+        <h4>The Stress Tests</h4>
+        <p>Rephrase scenarios harshly (synonym attack), inject mild personas ("you tend to weigh outcomes"), and swap models &mdash; does the structure survive?</p>
+      </div>
+    </div>
+
+    <h2 id="methodology">Repertory Grid Methodology</h2>
+    <p>
+      Repertory Grids (RepGrids) were invented by psychologist George Kelly in 1955. The core loop is:
+    </p>
+    <ol>
+      <li><strong>Present a triad</strong> &mdash; three items (called <em>elements</em>).</li>
+      <li><strong>Elicit a construct</strong> &mdash; ask "which two are similar, and how do they differ from the third?" The answer is a bipolar dimension (e.g., <code>individual harm</code> vs <code>systemic harm</code>).</li>
+      <li><strong>Rate all elements</strong> &mdash; score every element on that dimension (1&ndash;10 scale).</li>
+      <li><strong>Repeat</strong> with different triads to build a matrix of constructs &times; elements.</li>
+    </ol>
+    <p>
+      This project automates the entire process with LLMs as participants, running hundreds of
+      iterations to build statistical power. The resulting grids are compared using vector
+      embeddings and geometric alignment algorithms.
+    </p>
+
+    <h2 id="architecture">System Architecture</h2>
+    <div class="diagram"><span class="label">                         RepGrid Experiment Architecture</span>
+
+<span class="box">┌──────────────────┐</span>     <span class="box">┌───────────────────────┐</span>     <span class="box">┌──────────────────┐</span>
+<span class="box">│  React Dashboard │</span><span class="arrow">────▶</span><span class="box">│    Fastify REST API   │</span><span class="arrow">────▶</span><span class="box">│  LLM Providers   │</span>
+<span class="box">│   (Vite, Plotly) │</span><span class="arrow">◀────</span><span class="box">│     (server.ts)       │</span><span class="arrow">◀────</span><span class="box">│  Claude, GPT,    │</span>
+<span class="box">│   Port 5173      │</span>     <span class="box">│     Port 3001         │</span>     <span class="box">│  Gemini, DeepSeek│</span>
+<span class="box">└──────────────────┘</span>     <span class="box">└──────────┬────────────┘</span>     <span class="box">└──────────────────┘</span>
+                                  <span class="arrow">│</span>
+<span class="box">┌──────────────────┐</span>          <span class="arrow">│</span>          <span class="box">┌──────────────────┐</span>
+<span class="box">│ Human Baseline   │</span>          <span class="arrow">│</span>          <span class="box">│   Voyage AI      │</span>
+<span class="box">│ (Next.js :3002)  │</span><span class="arrow">─────────▶│◀─────────</span><span class="box">│   (Embeddings)   │</span>
+<span class="box">└──────────────────┘</span>          <span class="arrow">│</span>          <span class="box">└──────────────────┘</span>
+                                  <span class="arrow">│</span>
+                         <span class="box">┌────────┴─────────┐</span>
+                         <span class="box">│  Storage Adapter  │</span>
+                         <span class="box">│  (fs or S3/R2)    │</span>
+                         <span class="box">└───────────────────┘</span></div>
+    <p>Three independently deployable components:</p>
+    <table>
+      <thead><tr><th>Component</th><th>Stack</th><th>Port</th><th>Role</th></tr></thead>
+      <tbody>
+        <tr><td>API Server</td><td>Fastify + TypeScript</td><td>3001</td><td>Runs experiments, serves results, handles auth</td></tr>
+        <tr><td>Dashboard</td><td>React + Vite + Plotly</td><td>5173</td><td>Visualizes grids, metrics, and cross-model comparisons</td></tr>
+        <tr><td>Human Baseline</td><td>Next.js</td><td>3002</td><td>Collects RepGrid data from human participants for comparison</td></tr>
+      </tbody>
+    </table>
+
+    <!-- ════════════════════════════════ HOW IT WORKS ════════════════════════════════ -->
+
+    <h2 id="flow">Experiment Flow</h2>
+    <p>When you start an experiment (via dashboard or CLI), here is what happens end to end:</p>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <h4>1. Initialize</h4>
+        <p><code>ExperimentRunner.initialize()</code> loads YAML configs, creates the LLM client from the model registry, tests API connections to both the LLM provider and Voyage AI, and generates an experiment ID.</p>
+      </div>
+      <div class="timeline-item">
+        <h4>2. Elicit Constructs</h4>
+        <p><code>TriadicElicitor.elicitConstruct()</code> selects a triad (3 elements), sends the triadic prompt to the LLM, and parses the JSON response containing construct poles (e.g., <code>construct_pole_a</code>, <code>construct_pole_b</code>, <code>similar_pair</code>, <code>explanation</code>).</p>
+      </div>
+      <div class="timeline-item">
+        <h4>3. Rate Elements</h4>
+        <p><code>TriadicElicitor.rateElements()</code> asks the LLM to rate all 15 elements on the elicited dimension (1&ndash;10 scale). Elements are shuffled to reduce order effects. <code>N/A</code> responses are substituted with midpoint (5.5) and tracked.</p>
+      </div>
+      <div class="timeline-item">
+        <h4>4. Generate Embeddings</h4>
+        <p>After each phase, construct texts (<code>"pole_a vs pole_b"</code>) are sent to <strong>Voyage AI</strong> for vector embeddings. These enable semantic clustering and cross-model comparison.</p>
+      </div>
+      <div class="timeline-item">
+        <h4>5. Calculate Metrics</h4>
+        <p>Stability metrics are computed: cosine similarity between construct embeddings, Procrustes residual between rating matrices, synonym variance ratios, and persona displacement scores.</p>
+      </div>
+      <div class="timeline-item">
+        <h4>6. Save Results</h4>
+        <p>Grids, logs, analysis, and a manifest are written to <code>data/results/&lt;experiment-id&gt;/</code>. The manifest tracks experiment status, config, and timing.</p>
+      </div>
+    </div>
+
+    <h2 id="phases">Experimental Phases</h2>
+
+    <div class="card">
+      <h4><span class="badge badge-green">Phase 0</span> Baseline Stability</h4>
+      <p>Run the same elicitation process <strong>50 times</strong> (pilot: 10) with identical settings: default persona, neutral phrasing. Measures the model's inherent consistency. Optional framing rotation tests whether awareness of evaluation changes behavior.</p>
+      <p>After Phase 0, a <strong>random baseline</strong> is computed (Monte Carlo) and a <strong>trivial element control</strong> is run using non-ethical items (meals, objects) to provide a negative control.</p>
+    </div>
+
+    <div class="card">
+      <h4><span class="badge badge-amber">Phase 1</span> Synonym Attack (Phrasing Sensitivity)</h4>
+      <p>Same process, but alternates between <strong>neutral</strong> and <strong>dysphemistic</strong> phrasings of the same scenarios. For example, "Euthanasia for a terminally ill patient" might become "Killing a sick person." Measures whether surface-level language changes shift the model's conceptual structure.</p>
+      <p>Key metric: <strong>Synonym Variance Ratio (SVR)</strong> &mdash; ratio of between-phrasing variance to within-phrasing variance. A value near 1.0 means phrasing had no effect.</p>
+    </div>
+
+    <div class="card">
+      <h4><span class="badge badge-red">Phase 2</span> Persona Invariance</h4>
+      <p>Same process, but with different system prompts: a <strong>default</strong> (no persona) vs <strong>mild personas</strong> like "you tend to weigh outcomes more heavily than intentions." Measures whether persona steering shifts the model's value structure.</p>
+      <p>Key metric: <strong>Persona Displacement Score (PDS)</strong> &mdash; cosine distance between the default and steered construct spaces. Lower is better (&lt;0.3 = stable).</p>
+    </div>
+
+    <div class="callout">
+      <strong>Cross-Model Comparison:</strong> After Phase 0, you can <em>rerun</em> with a different model using the same triads. The system then computes shared vs unique dimensions, overlap ratios, and saturation curves between models.
+    </div>
+
+    <h2 id="analysis">Analysis &amp; Metrics</h2>
+    <table>
+      <thead><tr><th>Metric</th><th>File</th><th>What It Measures</th><th>Pass Threshold</th></tr></thead>
+      <tbody>
+        <tr><td>Cosine Similarity</td><td><code>metrics.ts</code></td><td>Semantic consistency of constructs across iterations</td><td>&gt; 0.7</td></tr>
+        <tr><td>Procrustes Residual</td><td><code>metrics.ts</code></td><td>Geometric distance between rating matrices after optimal alignment</td><td>&lt; 0.2</td></tr>
+        <tr><td>Normalized Procrustes</td><td><code>metrics.ts</code></td><td>Procrustes residual scaled by element count for cross-experiment comparison</td><td>&lt; 0.2</td></tr>
+        <tr><td>Stability Score</td><td><code>metrics.ts</code></td><td>Composite normalized score (higher = more stable)</td><td>&mdash;</td></tr>
+        <tr><td>SVR</td><td><code>metrics.ts</code></td><td>Synonym Variance Ratio &mdash; phrasing sensitivity</td><td>&asymp; 1.0</td></tr>
+        <tr><td>PDS</td><td><code>metrics.ts</code></td><td>Persona Displacement Score &mdash; persona sensitivity</td><td>&lt; 0.3</td></tr>
+        <tr><td>Dimensionality</td><td><code>dimensionality.ts</code></td><td>Number of unique conceptual dimensions via embedding clustering</td><td>&mdash;</td></tr>
+        <tr><td>Saturation Curve</td><td><code>dimensionality.ts</code></td><td>Rate at which new unique dimensions emerge per iteration</td><td>&mdash;</td></tr>
+        <tr><td>Cross-Model Overlap</td><td><code>crossModel.ts</code></td><td>Shared dimensions between two models on the same triads</td><td>&mdash;</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="codebase">Codebase Map</h2>
+    <div class="file-tree">
+<span class="dir">repgrid-experiment/</span>
+<span class="dir">  config/</span>
+<span class="file">    elements.yaml</span>        <span class="desc">&mdash; 15 ethical scenarios (E01&ndash;E15)</span>
+<span class="file">    prompts.yaml</span>         <span class="desc">&mdash; Triadic, rating, framing, synonym prompt templates</span>
+<span class="file">    experiment.yaml</span>      <span class="desc">&mdash; Model registry, phase settings, thresholds</span>
+<span class="file">    synonyms.yaml</span>        <span class="desc">&mdash; Neutral/dysphemistic/euphemistic phrasings</span>
+<span class="dir">  src/</span>
+<span class="dir">    core/</span>
+<span class="file">      triadic.ts</span>          <span class="desc">&mdash; Triad selection, construct elicitation, element rating</span>
+<span class="file">      metrics.ts</span>          <span class="desc">&mdash; Cosine, Procrustes, SVR, PDS calculations</span>
+<span class="file">      types.ts</span>            <span class="desc">&mdash; TypeScript interfaces (Grid, Construct, Element, etc.)</span>
+<span class="dir">    clients/</span>
+<span class="file">      llmClient.ts</span>       <span class="desc">&mdash; Abstract LLM interface (sendMessage, sendMessageForJSON)</span>
+<span class="file">      anthropic.ts</span>       <span class="desc">&mdash; Claude provider implementation</span>
+<span class="file">      openai.ts</span>          <span class="desc">&mdash; OpenAI/GPT provider implementation</span>
+<span class="file">      gemini.ts</span>          <span class="desc">&mdash; Google Gemini provider implementation</span>
+<span class="file">      ollama.ts</span>          <span class="desc">&mdash; Local Ollama provider implementation</span>
+<span class="file">      registry.ts</span>        <span class="desc">&mdash; Factory: maps model keys to provider clients</span>
+<span class="file">      voyage.ts</span>          <span class="desc">&mdash; Voyage AI embedding client</span>
+<span class="file">      jsonExtract.ts</span>     <span class="desc">&mdash; Extracts JSON from LLM markdown responses</span>
+<span class="dir">    experiment/</span>
+<span class="file">      runner.ts</span>          <span class="desc">&mdash; Orchestrator: initializes, runs all phases, saves metrics</span>
+<span class="dir">    analysis/</span>
+<span class="file">      dimensionality.ts</span>  <span class="desc">&mdash; Embedding clustering, saturation curves, PCA</span>
+<span class="file">      crossModel.ts</span>      <span class="desc">&mdash; Cross-model dimension comparison</span>
+<span class="file">      baseline.ts</span>        <span class="desc">&mdash; Random baseline Monte Carlo simulation</span>
+<span class="file">      humanBaseline.ts</span>   <span class="desc">&mdash; Human baseline comparison analysis</span>
+<span class="file">      constructMatch.ts</span>  <span class="desc">&mdash; Construct similarity matching</span>
+<span class="file">      gpa.ts</span>             <span class="desc">&mdash; Generalized Procrustes Analysis implementation</span>
+<span class="file">      thresholdCalibration.ts</span> <span class="desc">&mdash; Data-driven threshold calibration</span>
+<span class="dir">    services/</span>
+<span class="file">      storage.ts</span>         <span class="desc">&mdash; Storage adapter (filesystem or S3/R2)</span>
+<span class="file">      config.ts</span>          <span class="desc">&mdash; YAML config loader</span>
+<span class="file">      logger.ts</span>          <span class="desc">&mdash; Experiment logger (grids, API calls, decisions)</span>
+<span class="file">      retry.ts</span>           <span class="desc">&mdash; Exponential backoff retry utility</span>
+<span class="dir">    auth/</span>
+<span class="file">      middleware.ts</span>      <span class="desc">&mdash; JWT authentication + rate limiting</span>
+<span class="file">      users.ts</span>           <span class="desc">&mdash; SQLite user store with bcrypt hashing</span>
+<span class="file">    server.ts</span>            <span class="desc">&mdash; Fastify REST API (20+ endpoints)</span>
+<span class="file">    cli.ts</span>               <span class="desc">&mdash; Command-line experiment runner</span>
+<span class="dir">  web/</span>                    <span class="desc">&mdash; React + Vite + Plotly dashboard</span>
+<span class="dir">  human-baseline/</span>        <span class="desc">&mdash; Next.js human participant survey</span>
+<span class="dir">  scripts/</span>               <span class="desc">&mdash; Utility scripts (admin user creation)</span>
+    </div>
+
+    <!-- ════════════════════════════════ SETUP ════════════════════════════════ -->
+
+    <h2 id="prerequisites">Prerequisites</h2>
+    <ul>
+      <li><strong>Node.js &ge; 20</strong> &mdash; <a href="https://nodejs.org">nodejs.org</a></li>
+      <li><strong>npm</strong> (comes with Node.js)</li>
+      <li>At least one LLM API key (Anthropic, OpenAI, Google, or DeepSeek)</li>
+      <li><strong>Voyage AI</strong> API key for construct embeddings &mdash; <a href="https://dash.voyageai.com">dash.voyageai.com</a></li>
+    </ul>
+
+    <h2 id="install">Installation</h2>
+    <pre><code><span class="comment"># Clone the repository</span>
+<span class="cmd">git clone</span> https://github.com/gregdickason/repgrid-experiment.git
+<span class="cmd">cd</span> repgrid-experiment
+
+<span class="comment"># Install backend dependencies</span>
+<span class="cmd">npm install</span>
+
+<span class="comment"># Install dashboard dependencies</span>
+<span class="cmd">cd</span> web
+<span class="cmd">npm install</span>
+<span class="cmd">cd</span> ..
+
+<span class="comment"># (Optional) Install human baseline app</span>
+<span class="cmd">cd</span> human-baseline
+<span class="cmd">npm install</span>
+<span class="cmd">cd</span> ..</code></pre>
+
+    <h2 id="env">Environment Variables</h2>
+    <pre><code><span class="comment"># Copy the example and fill in your keys</span>
+<span class="cmd">cp</span> .env.example .env</code></pre>
+    <table>
+      <thead><tr><th>Variable</th><th>Required</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>ANTHROPIC_API_KEY</code></td><td><span class="badge badge-green">Yes*</span></td><td>Claude API key from <a href="https://console.anthropic.com">console.anthropic.com</a></td></tr>
+        <tr><td><code>VOYAGE_API_KEY</code></td><td><span class="badge badge-green">Yes</span></td><td>Voyage AI key for construct embeddings</td></tr>
+        <tr><td><code>OPENAI_API_KEY</code></td><td><span class="badge badge-blue">For GPT</span></td><td>OpenAI key for GPT models</td></tr>
+        <tr><td><code>GOOGLE_API_KEY</code></td><td><span class="badge badge-blue">For Gemini</span></td><td>Google key from AI Studio</td></tr>
+        <tr><td><code>DEEPSEEK_API_KEY</code></td><td><span class="badge badge-blue">For DeepSeek</span></td><td>DeepSeek platform key</td></tr>
+        <tr><td><code>OPENROUTER_API_KEY</code></td><td><span class="badge badge-blue">For OpenRouter</span></td><td>OpenRouter routing key</td></tr>
+        <tr><td><code>PORT</code></td><td>No</td><td>Server port (default: <code>3001</code>)</td></tr>
+        <tr><td><code>HOST</code></td><td>No</td><td>Bind address (default: <code>0.0.0.0</code>)</td></tr>
+        <tr><td><code>STORAGE_BACKEND</code></td><td>No</td><td><code>fs</code> (default) or <code>s3</code></td></tr>
+        <tr><td><code>S3_BUCKET</code>, <code>S3_REGION</code>, etc.</td><td><span class="badge badge-blue">For S3</span></td><td>S3/R2 config when using cloud storage</td></tr>
+        <tr><td><code>JWT_SECRET</code></td><td>No</td><td>Enables auth when set (&ge;32 chars recommended). Without it, auth is disabled (dev mode).</td></tr>
+        <tr><td><code>ADMIN_EMAIL</code> / <code>ADMIN_PASSWORD</code></td><td>No</td><td>Auto-creates admin user on startup</td></tr>
+        <tr><td><code>ALLOWED_ORIGINS</code></td><td>No</td><td>Comma-separated CORS whitelist (e.g., <code>http://localhost:5173</code>)</td></tr>
+      </tbody>
+    </table>
+    <p><em>* At least one LLM provider key is required. Anthropic (Claude Haiku) is the default model.</em></p>
+
+    <h2 id="run-dev">Run in Development</h2>
+    <p>Open <strong>two terminals</strong>:</p>
+
+    <h4>Terminal 1 &mdash; API Server</h4>
+    <pre><code><span class="cmd">npm run dev</span>
+<span class="comment"># Starts Fastify server on http://localhost:3001 with hot reload (tsx watch)</span></code></pre>
+
+    <h4>Terminal 2 &mdash; Dashboard</h4>
+    <pre><code><span class="cmd">cd</span> web
+<span class="cmd">npm run dev</span>
+<span class="comment"># Starts Vite dev server on http://localhost:5173</span></code></pre>
+
+    <h4>(Optional) Terminal 3 &mdash; Human Baseline</h4>
+    <pre><code><span class="cmd">cd</span> human-baseline
+<span class="cmd">npm run dev</span>
+<span class="comment"># Starts Next.js on http://localhost:3002</span></code></pre>
+
+    <div class="callout">
+      <strong>Quick smoke test:</strong> Open <code>http://localhost:3001/health</code> &mdash; you should see <code>{"status":"ok"}</code>. Then open <code>http://localhost:5173</code> for the dashboard.
+    </div>
+
+    <h2 id="cli">CLI Usage</h2>
+    <p>Run experiments directly from the command line without the dashboard:</p>
+    <pre><code><span class="comment"># Pilot run (10 iterations, default Claude Haiku)</span>
+<span class="cmd">npm run experiment</span>
+
+<span class="comment"># Pilot with a specific model</span>
+<span class="cmd">npm run experiment</span> <span class="flag">-- --model=claude-sonnet</span>
+
+<span class="comment"># Full experiment (50 iterations)</span>
+<span class="cmd">npm run experiment</span> <span class="flag">-- --full</span>
+
+<span class="comment"># Run only Phase 0 (baseline)</span>
+<span class="cmd">npm run experiment</span> <span class="flag">-- --phase=0</span>
+
+<span class="comment"># Cross-model comparison: rerun with different model using same triads</span>
+<span class="cmd">npm run experiment</span> <span class="flag">-- --model=gpt-5 --rerun=&lt;experiment-id&gt;</span>
+
+<span class="comment"># Threshold calibration from existing data</span>
+<span class="cmd">npm run experiment</span> <span class="flag">-- --calibrate</span>
+
+<span class="comment"># Show help</span>
+<span class="cmd">npm run experiment</span> <span class="flag">-- --help</span></code></pre>
+
+    <div class="callout callout-warn">
+      <strong>API delay:</strong> If you hit rate limits, add <code>--apiDelay=2</code> (seconds between API calls) when running via the dashboard, or set <code>apiDelaySeconds</code> in the POST body.
+    </div>
+
+    <!-- ════════════════════════════════ DEPLOYMENT ════════════════════════════════ -->
+
+    <h2 id="docker">Docker</h2>
+    <pre><code><span class="comment"># Build the image</span>
+<span class="cmd">docker build</span> -t repgrid-experiment .
+
+<span class="comment"># Run with your .env file</span>
+<span class="cmd">docker run</span> --env-file .env -p 3001:3001 repgrid-experiment</code></pre>
+    <p>The Dockerfile uses <code>node:20-alpine</code>, installs native build tools for <code>better-sqlite3</code> and <code>bcrypt</code>, compiles TypeScript, and runs <code>dist/server.js</code>.</p>
+
+    <h2 id="production">Production (Railway + Vercel)</h2>
+    <div class="card-grid">
+      <div class="card">
+        <h4>Backend &rarr; Railway</h4>
+        <ol>
+          <li>Connect your GitHub repo to <a href="https://railway.app">Railway</a></li>
+          <li>Set all environment variables (API keys, <code>JWT_SECRET</code>, <code>STORAGE_BACKEND=s3</code>)</li>
+          <li>Configure S3/R2 for persistent storage</li>
+          <li>Railway auto-detects the Dockerfile</li>
+        </ol>
+      </div>
+      <div class="card">
+        <h4>Dashboard &rarr; Vercel</h4>
+        <ol>
+          <li>Import the repo on <a href="https://vercel.com">Vercel</a></li>
+          <li>Set root directory to <code>web</code></li>
+          <li>Set <code>VITE_API_URL</code> to your Railway backend URL</li>
+          <li>Deploy &mdash; Vercel handles the Vite build</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════ REFERENCE ════════════════════════════════ -->
+
+    <h2 id="api">API Endpoints</h2>
+    <table>
+      <thead><tr><th>Method</th><th>Path</th><th>Auth</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge badge-green">GET</span></td><td><code>/health</code></td><td>No</td><td>Health check</td></tr>
+        <tr><td><span class="badge badge-green">GET</span></td><td><code>/config</code></td><td>Yes</td><td>Returns YAML configuration files</td></tr>
+        <tr><td><span class="badge badge-green">GET</span></td><td><code>/models</code></td><td>Yes</td><td>Lists available models with API key status</td></tr>
+        <tr><td><span class="badge badge-amber">POST</span></td><td><code>/experiment/run</code></td><td>Yes</td><td>Start a new experiment</td></tr>
+        <tr><td><span class="badge badge-amber">POST</span></td><td><code>/experiment/:id/rerun</code></td><td>Yes</td><td>Rerun Phase 0 with alternative model</td></tr>
+        <tr><td><span class="badge badge-green">GET</span></td><td><code>/experiment/status/:id</code></td><td>Yes</td><td>Experiment status (running/completed/failed)</td></tr>
+        <tr><td><span class="badge badge-green">GET</span></td><td><code>/experiments</code></td><td>Yes</td><td>List all experiments (sorted by date)</td></tr>
+        <tr><td><span class="badge badge-red">DELETE</span></td><td><code>/experiments/:id</code></td><td>Yes</td><td>Delete an experiment and its data</td></tr>
+        <tr><td><span class="badge badge-green">GET</span></td><td><code>/results/:id</code></td><td>Yes</td><td>Manifest + summary + analysis</td></tr>
+        <tr><td><span class="badge badge-green">GET</span></td><td><code>/results/:id/grids</code></td><td>Yes</td><td>Grids with optional phase/persona/phrasing filters</td></tr>
+        <tr><td><span class="badge badge-green">GET</span></td><td><code>/results/:id/logs</code></td><td>Yes</td><td>Paginated API call logs</td></tr>
+        <tr><td><span class="badge badge-green">GET</span></td><td><code>/results/:id/analysis</code></td><td>Yes</td><td>All analysis files for an experiment</td></tr>
+        <tr><td><span class="badge badge-green">GET</span></td><td><code>/results/:id/analysis/dimensionality</code></td><td>Yes</td><td>Embedding dimensionality analysis</td></tr>
+        <tr><td><span class="badge badge-green">GET</span></td><td><code>/results/:id/analysis/cross-model</code></td><td>Yes</td><td>Cross-model comparison results</td></tr>
+        <tr><td><span class="badge badge-green">GET</span></td><td><code>/analysis/calibration</code></td><td>Yes</td><td>Threshold calibration data</td></tr>
+        <tr><td><span class="badge badge-amber">POST</span></td><td><code>/analysis/calibrate</code></td><td>Yes</td><td>Run threshold calibration</td></tr>
+        <tr><td><span class="badge badge-green">GET</span></td><td><code>/analysis/human</code></td><td>Yes</td><td>Human baseline analysis</td></tr>
+        <tr><td><span class="badge badge-amber">POST</span></td><td><code>/human-baseline/submit</code></td><td>Yes</td><td>Submit a human participant grid</td></tr>
+        <tr><td><span class="badge badge-green">GET</span></td><td><code>/human-baseline/grids</code></td><td>Yes</td><td>List all human baseline grids</td></tr>
+        <tr><td><span class="badge badge-amber">POST</span></td><td><code>/auth/login</code></td><td>No</td><td>Login (returns JWT)</td></tr>
+        <tr><td><span class="badge badge-amber">POST</span></td><td><code>/auth/register</code></td><td>Admin</td><td>Register new user (first user becomes admin)</td></tr>
+        <tr><td><span class="badge badge-green">GET</span></td><td><code>/auth/me</code></td><td>Yes</td><td>Current user info</td></tr>
+        <tr><td><span class="badge badge-green">GET</span></td><td><code>/auth/users</code></td><td>Admin</td><td>List all users</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="models">Supported Models</h2>
+    <table>
+      <thead><tr><th>Key</th><th>Provider</th><th>Model</th><th>Env Var Needed</th></tr></thead>
+      <tbody>
+        <tr><td><code>claude-haiku</code></td><td>Anthropic</td><td>Claude Haiku (default)</td><td><code>ANTHROPIC_API_KEY</code></td></tr>
+        <tr><td><code>claude-sonnet</code></td><td>Anthropic</td><td>Claude Sonnet</td><td><code>ANTHROPIC_API_KEY</code></td></tr>
+        <tr><td><code>claude-opus</code></td><td>Anthropic</td><td>Claude Opus</td><td><code>ANTHROPIC_API_KEY</code></td></tr>
+        <tr><td><code>gpt-5</code></td><td>OpenAI</td><td>GPT-5</td><td><code>OPENAI_API_KEY</code></td></tr>
+        <tr><td><code>gpt-4.1</code></td><td>OpenAI</td><td>GPT-4.1</td><td><code>OPENAI_API_KEY</code></td></tr>
+        <tr><td><code>o3</code></td><td>OpenAI</td><td>o3</td><td><code>OPENAI_API_KEY</code></td></tr>
+        <tr><td><code>gemini-2.5-pro</code></td><td>Google</td><td>Gemini 2.5 Pro</td><td><code>GOOGLE_API_KEY</code></td></tr>
+        <tr><td><code>gemini-2.5-flash</code></td><td>Google</td><td>Gemini 2.5 Flash</td><td><code>GOOGLE_API_KEY</code></td></tr>
+        <tr><td><code>deepseek-v3</code></td><td>DeepSeek</td><td>DeepSeek V3</td><td><code>DEEPSEEK_API_KEY</code></td></tr>
+        <tr><td><code>deepseek-r1</code></td><td>DeepSeek</td><td>DeepSeek R1</td><td><code>DEEPSEEK_API_KEY</code></td></tr>
+        <tr><td><code>llama-4</code></td><td>Ollama</td><td>Llama 4 (local)</td><td>None (local)</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="config">Configuration Files</h2>
+    <div class="card-grid">
+      <div class="card">
+        <h4>elements.yaml</h4>
+        <p>15 ethical scenarios (E01&ndash;E15) spanning interpersonal, institutional, bioethical, and political domains. Each element has an ID, label, description, and <code>pilot: true/false</code> flag. Additional domain configs in <code>config/meals/</code>, <code>config/instruments/</code>, <code>config/objects/</code>.</p>
+      </div>
+      <div class="card">
+        <h4>prompts.yaml</h4>
+        <p>Templates for triadic elicitation, element rating, framing variants (formal/conversational/instructional), synonym generation, construct validity checks, and doctrinal oracle mode.</p>
+      </div>
+      <div class="card">
+        <h4>experiment.yaml</h4>
+        <p>Master config: model registry, phase enable/disable flags, iteration counts, temperature settings, embedding model (Voyage), clustering thresholds, pilot vs full parameters, and evaluation awareness settings.</p>
+      </div>
+      <div class="card">
+        <h4>synonyms.yaml</h4>
+        <p>Neutral, euphemistic, and dysphemistic phrasings for each element. Used in Phase 1 to test phrasing sensitivity without changing the underlying scenario.</p>
+      </div>
+    </div>
+
+    <h2 id="glossary">Glossary</h2>
+    <table>
+      <thead><tr><th>Term</th><th>Definition</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Element</strong></td><td>An item being compared (e.g., "Lying to protect a friend"). 15 elements in the ethics domain.</td></tr>
+        <tr><td><strong>Triad</strong></td><td>A group of 3 elements presented to the LLM for comparison.</td></tr>
+        <tr><td><strong>Construct</strong></td><td>A bipolar dimension elicited from a triad (e.g., "individual harm" vs "systemic harm").</td></tr>
+        <tr><td><strong>Pole</strong></td><td>One end of a construct. Pole A = emergent (similar pair); Pole B = contrast (odd one out).</td></tr>
+        <tr><td><strong>Grid</strong></td><td>A matrix of constructs &times; elements with ratings (1&ndash;10). One grid per iteration.</td></tr>
+        <tr><td><strong>Phrasing</strong></td><td>The linguistic register used for element descriptions: neutral, dysphemistic, or euphemistic.</td></tr>
+        <tr><td><strong>Persona</strong></td><td>A system prompt modifier that steers the model's perspective (e.g., "you tend to weigh outcomes").</td></tr>
+        <tr><td><strong>Framing</strong></td><td>The evaluation-awareness register: formal, conversational, or instructional.</td></tr>
+        <tr><td><strong>Procrustes Analysis</strong></td><td>Geometric alignment technique that finds the optimal rotation/scaling to overlay two matrices, then measures residual distance.</td></tr>
+        <tr><td><strong>GPA</strong></td><td>Generalized Procrustes Analysis &mdash; extends Procrustes to align 3+ matrices simultaneously.</td></tr>
+        <tr><td><strong>SVR</strong></td><td>Synonym Variance Ratio &mdash; between-phrasing variance / within-phrasing variance. Near 1.0 = stable.</td></tr>
+        <tr><td><strong>PDS</strong></td><td>Persona Displacement Score &mdash; cosine distance between default and steered construct spaces.</td></tr>
+        <tr><td><strong>Saturation Curve</strong></td><td>Plot of unique dimensions discovered vs iterations. Flattening = model has exhausted its conceptual repertoire.</td></tr>
+      </tbody>
+    </table>
+
+    <div style="margin-top:60px; padding-top:24px; border-top:1px solid var(--border); color:var(--text-muted); font-size:13px;">
+      <p>Documentation by Deepak Senthilkumar &amp; Claude &mdash; April 2026</p>
+      <p>Source: <a href="https://github.com/gregdickason/repgrid-experiment">github.com/gregdickason/repgrid-experiment</a></p>
+    </div>
+
+  </main>
+</div>
+</body>
+</html>
