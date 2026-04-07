@@ -3,6 +3,9 @@
  * Handles markdown code fences, nested braces, and multiple JSON blocks
  */
 
+/** Maximum input size to prevent DoS from extremely large LLM responses */
+const MAX_INPUT_LENGTH = 1_000_000; // 1MB
+
 /**
  * Extract and parse JSON from an LLM response string.
  *
@@ -14,6 +17,9 @@
  * Throws if no valid JSON object can be extracted.
  */
 export function extractJSON<T>(content: string): T {
+  if (content.length > MAX_INPUT_LENGTH) {
+    throw new Error(`Response too large for JSON extraction (${content.length} chars, max ${MAX_INPUT_LENGTH})`);
+  }
   // Step 1: Strip markdown code fences
   let cleaned = content;
 

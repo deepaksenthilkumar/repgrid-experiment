@@ -6,6 +6,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import type { LLMClient } from '../clients/llmClient.js';
 import type { ConfigLoader } from '../services/config.js';
+import { retryWithBackoff } from '../services/retry.js';
 import type { Element, Construct, Grid, GridLog, ConstructLog } from './types.js';
 
 export interface TriadSelectionStrategy {
@@ -141,19 +142,27 @@ export class TriadicElicitor {
       ? `${personaConfig.systemPrompt}\n\n${triadicSystemPrompt}`
       : triadicSystemPrompt;
 
-    // Call LLM
-    const { data, response } = await this.client.sendMessageForJSON<ElicitationResult>(
-      prompts.user,
+    // Call LLM with retry for transient failures
+    const { data, response } = await retryWithBackoff(
+      () => this.client.sendMessageForJSON<ElicitationResult>(
+        prompts.user,
+        {
+          systemPrompt,
+          temperature: metadata.temperature,
+          metadata: {
+            phase: metadata.phase,
+            iteration: metadata.iteration,
+            persona,
+            phrasing,
+            triadElements: [triad[0].id, triad[1].id, triad[2].id],
+            purpose: 'elicitation',
+          },
+        }
+      ),
       {
-        systemPrompt,
-        temperature: metadata.temperature,
-        metadata: {
-          phase: metadata.phase,
-          iteration: metadata.iteration,
-          persona,
-          phrasing,
-          triadElements: [triad[0].id, triad[1].id, triad[2].id],
-          purpose: 'elicitation',
+        maxRetries: 3,
+        onRetry: (error, attempt) => {
+          console.warn(`[TriadicElicitor] Elicitation retry ${attempt}/3: ${error instanceof Error ? error.message : 'Unknown error'}`);
         },
       }
     );
@@ -195,18 +204,26 @@ export class TriadicElicitor {
       ? `${personaConfig.systemPrompt}\n\n${prompts.system}`
       : prompts.system;
 
-    // Call LLM — parse as RawRatingResult to handle N/A strings
-    const { data: rawData, response } = await this.client.sendMessageForJSON<RawRatingResult>(
-      prompts.user,
+    // Call LLM with retry — parse as RawRatingResult to handle N/A strings
+    const { data: rawData, response } = await retryWithBackoff(
+      () => this.client.sendMessageForJSON<RawRatingResult>(
+        prompts.user,
+        {
+          systemPrompt,
+          temperature: metadata.temperature,
+          metadata: {
+            phase: metadata.phase,
+            iteration: metadata.iteration,
+            persona,
+            phrasing,
+            purpose: 'rating',
+          },
+        }
+      ),
       {
-        systemPrompt,
-        temperature: metadata.temperature,
-        metadata: {
-          phase: metadata.phase,
-          iteration: metadata.iteration,
-          persona,
-          phrasing,
-          purpose: 'rating',
+        maxRetries: 3,
+        onRetry: (error, attempt) => {
+          console.warn(`[TriadicElicitor] Rating retry ${attempt}/3: ${error instanceof Error ? error.message : 'Unknown error'}`);
         },
       }
     );

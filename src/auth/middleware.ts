@@ -10,10 +10,53 @@ import type { User } from './users.js';
 
 const JWT_EXPIRY = '7d';
 
+/**
+ * Simple in-memory rate limiter for authentication endpoints.
+ * Tracks failed attempts by IP to prevent brute-force attacks.
+ */
+class AuthRateLimiter {
+  private attempts = new Map<string, { count: number; resetAt: number }>();
+  private readonly maxAttempts: number;
+  private readonly windowMs: number;
+
+  constructor(maxAttempts = 5, windowMs = 60_000) {
+    this.maxAttempts = maxAttempts;
+    this.windowMs = windowMs;
+  }
+
+  isRateLimited(ip: string): boolean {
+    const now = Date.now();
+    const entry = this.attempts.get(ip);
+    if (!entry || now > entry.resetAt) {
+      return false;
+    }
+    return entry.count >= this.maxAttempts;
+  }
+
+  recordAttempt(ip: string): void {
+    const now = Date.now();
+    const entry = this.attempts.get(ip);
+    if (!entry || now > entry.resetAt) {
+      this.attempts.set(ip, { count: 1, resetAt: now + this.windowMs });
+    } else {
+      entry.count++;
+    }
+  }
+
+  reset(ip: string): void {
+    this.attempts.delete(ip);
+  }
+}
+
+const authLimiter = new AuthRateLimiter();
+
 function getJwtSecret(): string {
   const secret = process.env.JWT_SECRET;
   if (!secret) {
     throw new Error('JWT_SECRET environment variable is required');
+  }
+  if (secret.length < 32) {
+    console.warn('[Auth] WARNING: JWT_SECRET is shorter than 32 characters. Use a longer secret in production.');
   }
   return secret;
 }
@@ -43,6 +86,14 @@ export async function registerAuth(fastify: FastifyInstance, userStore: UserStor
   fastify.post<{
     Body: { email: string; password: string };
   }>('/auth/login', async (request, reply) => {
+    const clientIp = request.ip;
+
+    // Rate limiting: block excessive login attempts
+    if (authLimiter.isRateLimited(clientIp)) {
+      reply.code(429);
+      return { error: 'Too many login attempts. Please try again later.' };
+    }
+
     const { email, password } = request.body || {};
     if (!email || !password) {
       reply.code(400);
@@ -51,9 +102,13 @@ export async function registerAuth(fastify: FastifyInstance, userStore: UserStor
 
     const user = await userStore.verifyPassword(email, password);
     if (!user) {
+      authLimiter.recordAttempt(clientIp);
       reply.code(401);
       return { error: 'Invalid email or password' };
     }
+
+    // Reset rate limiter on successful login
+    authLimiter.reset(clientIp);
 
     const token = jwt.sign({ sub: user.id, email: user.email, role: user.role }, secret, {
       expiresIn: JWT_EXPIRY,

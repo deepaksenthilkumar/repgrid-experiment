@@ -19,9 +19,13 @@ const fastify = Fastify({
   logger: true,
 });
 
-// Register CORS
+// Register CORS with configurable origin whitelist
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim())
+  : null;
+
 await fastify.register(cors, {
-  origin: true,
+  origin: allowedOrigins || true, // Restrict to whitelist in production, allow all in dev
 });
 
 // Initialize storage
@@ -66,6 +70,15 @@ async function markStaleExperiments(): Promise<void> {
 await markStaleExperiments();
 
 // Routes
+
+/** Shared JSON Schema for experimentId path params — alphanumeric, hyphens, underscores only */
+const experimentIdParamSchema = {
+  type: 'object' as const,
+  properties: {
+    experimentId: { type: 'string' as const, pattern: '^[a-zA-Z0-9_-]+$' },
+  },
+  required: ['experimentId'] as const,
+};
 
 /**
  * Health check
@@ -113,7 +126,22 @@ fastify.get('/models', async () => {
  */
 fastify.post<{
   Body: { pilot?: boolean; phases?: string[]; model?: string; rerunFrom?: string; apiDelaySeconds?: number; category?: string };
-}>('/experiment/run', async (request, reply) => {
+}>('/experiment/run', {
+  schema: {
+    body: {
+      type: 'object',
+      properties: {
+        pilot: { type: 'boolean' },
+        phases: { type: 'array', items: { type: 'string' } },
+        model: { type: 'string', maxLength: 100 },
+        rerunFrom: { type: 'string', maxLength: 200 },
+        apiDelaySeconds: { type: 'number', minimum: 0, maximum: 60 },
+        category: { type: 'string', maxLength: 50 },
+      },
+      additionalProperties: false,
+    },
+  },
+}, async (request, reply) => {
   const { pilot = true, phases, model = 'claude-haiku', rerunFrom, apiDelaySeconds, category = 'ethics' } = request.body || {};
 
   // Validate category
@@ -195,7 +223,24 @@ fastify.post<{
 fastify.post<{
   Params: { experimentId: string };
   Body: { model?: string };
-}>('/experiment/:experimentId/rerun', async (request, reply) => {
+}>('/experiment/:experimentId/rerun', {
+  schema: {
+    body: {
+      type: 'object',
+      properties: {
+        model: { type: 'string', maxLength: 100 },
+      },
+      additionalProperties: false,
+    },
+    params: {
+      type: 'object',
+      properties: {
+        experimentId: { type: 'string', pattern: '^[a-zA-Z0-9_-]+$' },
+      },
+      required: ['experimentId'],
+    },
+  },
+}, async (request, reply) => {
   const { experimentId } = request.params;
   const experimentDir = join('data/results', experimentId);
 
@@ -291,7 +336,9 @@ fastify.post<{
  */
 fastify.get<{
   Params: { experimentId: string };
-}>('/experiment/status/:experimentId', async (request, reply) => {
+}>('/experiment/status/:experimentId', {
+  schema: { params: experimentIdParamSchema },
+}, async (request, reply) => {
   const { experimentId } = request.params;
 
   const running = runningExperiments.get(experimentId);
@@ -379,7 +426,9 @@ fastify.get('/experiments', async () => {
  */
 fastify.delete<{
   Params: { experimentId: string };
-}>('/experiments/:experimentId', async (request, reply) => {
+}>('/experiments/:experimentId', {
+  schema: { params: experimentIdParamSchema },
+}, async (request, reply) => {
   const { experimentId } = request.params;
   const manifestPath = join('data/results', experimentId, 'manifest.json');
 
@@ -408,7 +457,9 @@ fastify.delete<{
  */
 fastify.get<{
   Params: { experimentId: string };
-}>('/results/:experimentId', async (request, reply) => {
+}>('/results/:experimentId', {
+  schema: { params: experimentIdParamSchema },
+}, async (request, reply) => {
   const { experimentId } = request.params;
   const experimentDir = join('data/results', experimentId);
 
@@ -448,7 +499,9 @@ fastify.get<{
 fastify.get<{
   Params: { experimentId: string };
   Querystring: { phase?: string; persona?: string; phrasing?: string };
-}>('/results/:experimentId/grids', async (request, reply) => {
+}>('/results/:experimentId/grids', {
+  schema: { params: experimentIdParamSchema },
+}, async (request, reply) => {
   const { experimentId } = request.params;
   const { phase, persona, phrasing } = request.query;
 
@@ -485,7 +538,9 @@ fastify.get<{
  */
 fastify.get<{
   Params: { experimentId: string };
-}>('/results/:experimentId/analysis/dimensionality', async (request, reply) => {
+}>('/results/:experimentId/analysis/dimensionality', {
+  schema: { params: experimentIdParamSchema },
+}, async (request, reply) => {
   const { experimentId } = request.params;
   const analysisPath = join('data/results', experimentId, 'analysis', 'dimensionality.json');
 
@@ -503,7 +558,9 @@ fastify.get<{
  */
 fastify.get<{
   Params: { experimentId: string };
-}>('/results/:experimentId/analysis/cross-model', async (request, reply) => {
+}>('/results/:experimentId/analysis/cross-model', {
+  schema: { params: experimentIdParamSchema },
+}, async (request, reply) => {
   const { experimentId } = request.params;
   const analysisPath = join('data/results', experimentId, 'analysis', 'cross_model_comparison.json');
 
@@ -521,7 +578,9 @@ fastify.get<{
  */
 fastify.get<{
   Params: { experimentId: string };
-}>('/results/:experimentId/analysis', async (request, reply) => {
+}>('/results/:experimentId/analysis', {
+  schema: { params: experimentIdParamSchema },
+}, async (request, reply) => {
   const { experimentId } = request.params;
   const analysisDir = join('data/results', experimentId, 'analysis');
 
@@ -595,7 +654,9 @@ fastify.get('/analysis/human', async (request, reply) => {
 fastify.get<{
   Params: { experimentId: string };
   Querystring: { limit?: number; offset?: number };
-}>('/results/:experimentId/logs', async (request, reply) => {
+}>('/results/:experimentId/logs', {
+  schema: { params: experimentIdParamSchema },
+}, async (request, reply) => {
   const { experimentId } = request.params;
   const { limit = 100, offset = 0 } = request.query;
 
@@ -635,8 +696,35 @@ fastify.post<{
     timestamp: string;
     metadata: unknown;
   };
-}>('/human-baseline/submit', async (request, reply) => {
+}>('/human-baseline/submit', {
+  schema: {
+    body: {
+      type: 'object',
+      required: ['persona', 'constructs'],
+      properties: {
+        id: { type: 'string', maxLength: 200 },
+        experimentId: { type: 'string', maxLength: 200 },
+        model: { type: 'string', maxLength: 100 },
+        persona: { type: 'string', minLength: 1, maxLength: 100 },
+        constructs: { type: 'array', maxItems: 500 },
+        timestamp: { type: 'string', maxLength: 50 },
+        metadata: {},
+      },
+      additionalProperties: false,
+    },
+  },
+}, async (request, reply) => {
   try {
+    // CSRF origin check: reject submissions from unexpected origins
+    if (allowedOrigins) {
+      const origin = request.headers.origin || request.headers.referer;
+      const originHost = origin ? new URL(origin).origin : null;
+      if (!originHost || !allowedOrigins.includes(originHost)) {
+        reply.code(403);
+        return { error: 'Forbidden: origin not allowed' };
+      }
+    }
+
     const grid = request.body;
 
     if (!grid || !grid.persona || !grid.constructs || !Array.isArray(grid.constructs)) {
@@ -644,7 +732,9 @@ fastify.post<{
       return { error: 'Invalid grid data: requires persona and constructs array' };
     }
 
-    const path = join('data', 'human_baselines', `${grid.persona}.json`);
+    // Sanitize persona to prevent path injection in filename
+    const safePersona = grid.persona.replace(/[^a-zA-Z0-9_-]/g, '_');
+    const path = join('data', 'human_baselines', `${safePersona}.json`);
     await storage.write(path, JSON.stringify(grid, null, 2));
 
     return {

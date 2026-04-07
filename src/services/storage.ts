@@ -4,7 +4,7 @@
  */
 
 import { mkdir, writeFile, readFile, readdir, stat, appendFile, rm } from 'fs/promises';
-import { join, dirname } from 'path';
+import { join, dirname, resolve, relative } from 'path';
 import {
   S3Client,
   PutObjectCommand,
@@ -32,27 +32,40 @@ export class FileSystemStorage implements StorageAdapter {
   private basePath: string;
 
   constructor(basePath: string = process.cwd()) {
-    this.basePath = basePath;
+    this.basePath = resolve(basePath);
+  }
+
+  /**
+   * Resolve and validate a path to prevent directory traversal attacks.
+   * Ensures the resolved path stays within basePath.
+   */
+  private safePath(path: string): string {
+    const fullPath = resolve(this.basePath, path);
+    const rel = relative(this.basePath, fullPath);
+    if (rel.startsWith('..') || resolve(fullPath) !== fullPath) {
+      throw new Error(`Path traversal detected: "${path}" resolves outside the base directory`);
+    }
+    return fullPath;
   }
 
   async read(path: string): Promise<string> {
-    return readFile(join(this.basePath, path), 'utf-8');
+    return readFile(this.safePath(path), 'utf-8');
   }
 
   async write(path: string, content: string): Promise<void> {
-    const fullPath = join(this.basePath, path);
+    const fullPath = this.safePath(path);
     await mkdir(dirname(fullPath), { recursive: true });
     await writeFile(fullPath, content);
   }
 
   async append(path: string, content: string): Promise<void> {
-    const fullPath = join(this.basePath, path);
+    const fullPath = this.safePath(path);
     await mkdir(dirname(fullPath), { recursive: true });
     await appendFile(fullPath, content);
   }
 
   async list(prefix: string): Promise<string[]> {
-    const fullPath = join(this.basePath, prefix);
+    const fullPath = this.safePath(prefix);
     try {
       const entries = await readdir(fullPath);
       return entries;
@@ -63,7 +76,7 @@ export class FileSystemStorage implements StorageAdapter {
 
   async exists(path: string): Promise<boolean> {
     try {
-      await stat(join(this.basePath, path));
+      await stat(this.safePath(path));
       return true;
     } catch {
       return false;
@@ -71,11 +84,11 @@ export class FileSystemStorage implements StorageAdapter {
   }
 
   async mkdir(path: string): Promise<void> {
-    await mkdir(join(this.basePath, path), { recursive: true });
+    await mkdir(this.safePath(path), { recursive: true });
   }
 
   async deleteDir(path: string): Promise<void> {
-    await rm(join(this.basePath, path), { recursive: true, force: true });
+    await rm(this.safePath(path), { recursive: true, force: true });
   }
 
   async flush(): Promise<void> {
